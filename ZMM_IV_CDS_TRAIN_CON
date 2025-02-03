@@ -1,0 +1,29 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Dimension Connection'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #L,
+    dataClass: #MASTER
+}
+
+@VDM.viewType: #BASIC
+@Analytics.dataCategory: #DIMENSION
+@ObjectModel.representativeKey: 'FlightConnection'
+
+define view entity ZMM_IV_CDS_TRAIN_CON 
+    as select from spfli
+    
+    association [0..1] to ZMM_IV_CDS_TRAIN_AIRLINE      as  _Airline        on  _Airline.Airline    = $projection.Airline
+{
+
+        @ObjectModel.foreignKey.association: '_Airline'
+    key carrid      as Airline,
+    key connid      as FlightConnection,
+    
+    
+        // Associations
+        _Airline
+    
+}
