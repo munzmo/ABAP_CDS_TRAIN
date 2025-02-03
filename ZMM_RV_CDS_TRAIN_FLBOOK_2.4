@@ -1,0 +1,36 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Cube View Flight Booking'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #XL,
+    dataClass: #MIXED
+}
+
+@Analytics.dataCategory: #CUBE
+
+define view entity ZMM_RV_CDS_TRAIN_FLBOOK 
+    as select from sbook    as flbook
+    
+    
+    association [0..1] to ZMM_IV_CDS_TRAIN_AIRLINE      as _Airline     on  _Airline.Airline        = $projection.Airline
+    association [0..1] to ZMM_IV_TRAIN_FLIGHTS          as _Flights     on  _Flights.Connid         = $projection.ConnectionNumber
+                                                                        and _Flights.Carrid         = $projection.Airline
+                                                                        and _Flights.Fldate         = $projection.FlightDate
+                                                                                
+
+{
+    key flbook.connid       as ConnectionNumber,
+        @ObjectModel.foreignKey.association: '_Flights'
+    key flbook.fldate       as FlightDate,   
+        @ObjectModel.foreignKey.association: '_Airline'
+    key flbook.carrid       as Airline,
+    key cast( flbook.bookid as s_book_id preserving type ) as BookingNumber,
+    
+    
+        // Associations
+        _Airline,
+        _Flights
+    
+}
