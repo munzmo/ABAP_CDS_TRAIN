@@ -14,7 +14,7 @@
 define view entity ZMM_IV_CDS_TRAIN_CUST 
     as select from scustom
     
-    association [0..1] to I_Country     as  _CountryCustomer        on  _CountryCustomer.Country    = $projection.Country  
+    association [0..1] to I_Country     as  _CountryCustomer        on  _CountryCustomer.Country    = $projection.CustomerCountry  
 {
     
         @ObjectModel.text.element: [ 'CustomerName' ]
@@ -25,7 +25,7 @@ define view entity ZMM_IV_CDS_TRAIN_CUST
         
         @ObjectModel.foreignKey.association: '_CountryCustomer'
         @Semantics.address.country: true
-        country     as Country,
+        country     as CustomerCountry,
         
         @Semantics.address.city: true
         city        as City,
