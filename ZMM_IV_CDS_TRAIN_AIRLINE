@@ -1,0 +1,26 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Dimension Airline'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #S,
+    dataClass: #MASTER
+}
+
+@VDM.viewType: #BASIC
+@Analytics.dataCategory: #DIMENSION
+
+define view entity ZMM_IV_CDS_TRAIN_AIRLINE 
+    as select from scarr
+{
+
+      @ObjectModel.text.element: [ 'AirlineName' ]
+  key carrid   as Airline,
+  
+      @Semantics.text: true
+      carrname as AirlineName,
+     
+      currcode as Currency
+    
+}
