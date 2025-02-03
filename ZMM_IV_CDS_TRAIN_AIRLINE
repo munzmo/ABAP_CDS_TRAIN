@@ -24,3 +24,4 @@ define view entity ZMM_IV_CDS_TRAIN_AIRLINE
       currcode as Currency
     
 }
+ 
