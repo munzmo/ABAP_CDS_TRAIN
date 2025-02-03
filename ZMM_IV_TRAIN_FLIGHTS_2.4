@@ -25,26 +25,33 @@ define view entity ZMM_IV_TRAIN_FLIGHTS
     key fldate      as Fldate,
         
         // Characteristics        
-        planetype   as Planetype,
-        seatsmax    as Seatsmax,
-        seatsocc    as Seatsocc,
+        planetype   as Planetype,        
         
+        // Association Dates
          @EndUserText.label: 'Flight Year'
         _CalendarDate.CalendarYear,
-
         @EndUserText.label: 'Flight Month'
         _CalendarDate.CalendarMonth,
-        
-        seatsmax_b  as SeatsmaxB,
-        seatsocc_b  as SeatsoccB,
-        seatsmax_f  as SeatsmaxF,
-        seatsocc_f  as SeatsoccF,
-        
+                       
         // Measures
         @Semantics.amount.currencyCode: 'CurrencyCode'
+        @Aggregation.default: #SUM
         price       as Price,
         @Semantics.amount.currencyCode: 'CurrencyCode'
+        @Aggregation.default: #SUM
         paymentsum  as Paymentsum,
+        @Aggregation.default: #SUM
+        seatsmax    as MaximumCapacityEconomyClass,
+        @Aggregation.default: #SUM
+        seatsocc    as OccupiedEconomyClass,
+        @Aggregation.default: #SUM
+        seatsmax_b  as MaximumCapacityBusinessClass,
+        @Aggregation.default: #SUM
+        seatsocc_b  as OccupiedBusinessClass,
+        @Aggregation.default: #SUM
+        seatsmax_f  as MaximumCapacityFirstClass,
+        @Aggregation.default: #SUM
+        seatsocc_f  as OccupiedFirstClass,
         
         // Currency Code
         currency    as CurrencyCode,
