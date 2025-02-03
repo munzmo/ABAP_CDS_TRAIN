@@ -1,6 +1,6 @@
 @AbapCatalog.viewEnhancementCategory: [#NONE]
 @AccessControl.authorizationCheck: #NOT_REQUIRED
-@EndUserText.label: 'Fact View Flights'
+@EndUserText.label: 'Dimension View Flights'
 @Metadata.ignorePropagatedAnnotations: true
 @ObjectModel.usageType:{
     serviceQuality: #X,
@@ -12,7 +12,7 @@
 @VDM.viewType: #BASIC
 
 
-define view entity ZMM_IV_TRAIN_FLIGHTS 
+define view entity ZMM_IV_CDS_TRAIN_FLIGHTS 
     as select from sflight      as flight
 
     association [0..1] to I_CalendarDate    as  _CalendarDate   on  _CalendarDate.CalendarDate  =   $projection.Fldate
