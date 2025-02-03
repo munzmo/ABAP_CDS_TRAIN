@@ -1,0 +1,37 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Dimension Travel Agency'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #S,
+    dataClass: #MASTER
+}
+
+@VDM.viewType: #BASIC
+@Analytics.dataCategory: #DIMENSION
+
+define view entity ZMM_IV_CDS_TRAIN_TRVAGCY 
+    as select from stravelag
+    
+    association [0..1] to I_Country     as  _CountryAgency      on  _CountryAgency.Country      = $projection.TravelAgencyCountry
+
+
+{
+    
+        @ObjectModel.text.element: [ 'TravelAgencyName' ]
+    key cast( agencynum as s_agncynum preserving type )   as TravelAgency,
+    
+        @Semantics.text: true
+        name        as TravelAgencyName,
+        @ObjectModel.foreignKey.association: '_CountryAgency'
+        @Semantics.address.country: true
+        country     as TravelAgencyCountry,
+        
+        @Semantics.address.city: true
+        city        as TravelAgencyCity,
+    
+        // Associations
+        _CountryAgency
+    
+}
