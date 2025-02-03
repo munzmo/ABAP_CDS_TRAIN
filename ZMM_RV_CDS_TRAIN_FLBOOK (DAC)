@@ -1,0 +1,10 @@
+@EndUserText.label: 'Access Control Flight Bookings'
+@MappingRole: true
+define role ZMM_RV_CDS_TRAIN_FLBOOK {
+    grant select on ZMM_RV_CDS_TRAIN_FLBOOK
+    where ( CustomerCountry ) = 
+    aspect pfcg_auth(  /DMO/TRVL,
+                       /DMO/CNTRY,
+                       ACTVT = '03' );
+                        
+}
