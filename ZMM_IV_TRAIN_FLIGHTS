@@ -1,0 +1,55 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Dimension Flights'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #S,
+    dataClass: #TRANSACTIONAL
+}
+
+@VDM.viewType: #BASIC
+@Analytics.dataCategory: #FACT
+
+
+define view entity ZMM_IV_TRAIN_FLIGHTS 
+    as select from sflight      as flight
+
+    association [0..1] to I_CalendarDate    as  _CalendarDate   on  _CalendarDate.CalendarDate  =   $projection.Fldate
+
+{
+        // Keys
+    key carrid      as Carrid,
+    key connid      as Connid,
+        @ObjectModel.foreignKey.association: '_CalendarDate'
+    key fldate      as Fldate,
+        
+        // Characteristics        
+        planetype   as Planetype,
+        seatsmax    as Seatsmax,
+        seatsocc    as Seatsocc,
+        
+         @EndUserText.label: 'Flight Year'
+        _CalendarDate.CalendarYear,
+
+        @EndUserText.label: 'Flight Month'
+        _CalendarDate.CalendarMonth,
+        
+        seatsmax_b  as SeatsmaxB,
+        seatsocc_b  as SeatsoccB,
+        seatsmax_f  as SeatsmaxF,
+        seatsocc_f  as SeatsoccF,
+        
+        // Measures
+        @Semantics.amount.currencyCode: 'CurrencyCode'
+        price       as Price,
+        @Semantics.amount.currencyCode: 'CurrencyCode'
+        paymentsum  as Paymentsum,
+        
+        // Currency Code
+        currency    as CurrencyCode,
+        
+        // Associations
+        _CalendarDate
+    
+}
