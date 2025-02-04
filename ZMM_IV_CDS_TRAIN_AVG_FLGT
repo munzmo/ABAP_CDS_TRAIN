@@ -1,0 +1,25 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Basic Interface View for AVG Flgt Price'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #S,
+    dataClass: #TRANSACTIONAL
+}
+
+@VDM.viewType: #BASIC
+@Analytics.dataCategory: #FACT
+
+
+define view entity ZMM_IV_CDS_TRAIN_AVG_FLGT 
+    as select from sflight
+{
+    // Keys
+    key carrid      as Airline,
+    
+        @DefaultAggregation: #SUM
+        avg( seatsmax_b as abap.dec(12,2)) as AVGSeatsBusiness
+    
+}
+group by carrid
