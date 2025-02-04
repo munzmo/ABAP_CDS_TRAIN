@@ -47,6 +47,10 @@ define view entity ZMM_CV_CDS_TRAIN_FLBOOK
         @AnalyticsDetails.query.hidden: true
         @AnalyticsDetails.query.decimals: 3
         LuggageWeight,
+        @Semantics.amount.currencyCode: 'PaymentCuky'
+        @AnalyticsDetails.query.hidden: true
+        @AnalyticsDetails.query.decimals: 2
+        BookingPrice,
         
         @AnalyticsDetails.query.hidden: true
         @EndUserText.label: 'AVG Weight per Airline and Connection'        
@@ -59,9 +63,15 @@ define view entity ZMM_CV_CDS_TRAIN_FLBOOK
         @AnalyticsDetails.query.formula: '(LuggageWeight)' 0
         as AVGLuggageWeightPerAirline,
         
+        @EndUserText.label: 'Booking Price w/o Taxes'
+        @AnalyticsDetails.query.hidden: true
+        @AnalyticsDetails.query.decimals: 2
+        @AnalyticsDetails.query:{ formula: 'BookingPrice * 0.81' }
+        1 as BookingPriceTaxes,
+        
         // Units
         UnitWeight,
-        
+        PaymentCuky,
         
         // Associations
         _Airline,
