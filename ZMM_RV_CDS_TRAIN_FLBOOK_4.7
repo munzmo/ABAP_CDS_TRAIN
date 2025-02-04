@@ -60,8 +60,13 @@ define view entity ZMM_RV_CDS_TRAIN_FLBOOK
         @Aggregation.default: #SUM
         avgflights.AVGSeatsBusiness,
         
+        @Semantics.amount.currencyCode: 'PaymentCuky'
+        @Aggregation.default: #SUM
+        flgtbook.forcuram    as BookingPrice,
+        
         // Units
         flgtbook.wunit       as UnitWeight,
+        flgtbook.forcurkey   as PaymentCuky,
     
     
         // Associations
