@@ -46,13 +46,19 @@ define view entity ZMM_RV_CDS_TRAIN_FLBOOK
         @ObjectModel.foreignKey.association: '_Customer'
         flgtbook.customid    as Customer,
         @Semantics.address.country: true
-        _Customer.CustomerCountry,
+        _Customer.CustomerCountry,        
+        flights.StatusCapacity,
+       
         
         
         // Measures
         @Semantics.quantity.unitOfMeasure: 'UnitWeight'
         @Aggregation.default: #SUM               
         flgtbook.luggweight  as LuggageWeight,
+        @Aggregation.default: #SUM
+        flights.FreeCapacityEconomyClass,
+        @Aggregation.default: #SUM
+        avgflights.AVGSeatsBusiness,
         
         // Units
         flgtbook.wunit       as UnitWeight,
