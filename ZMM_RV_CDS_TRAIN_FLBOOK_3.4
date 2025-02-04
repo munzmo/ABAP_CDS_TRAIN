@@ -1,5 +1,5 @@
 @AbapCatalog.viewEnhancementCategory: [#NONE]
-@AccessControl.authorizationCheck: #CHECK
+@AccessControl.authorizationCheck: #NOT_ALLOWED
 @EndUserText.label: 'Cube View Flight Booking'
 @Metadata.ignorePropagatedAnnotations: true
 @ObjectModel.usageType:{
@@ -36,6 +36,15 @@ define view entity ZMM_RV_CDS_TRAIN_FLBOOK
         flgtbook.customid    as Customer,
         @Semantics.address.country: true
         _Customer.CustomerCountry,
+        
+        
+        // Measures
+        @Semantics.quantity.unitOfMeasure: 'UnitWeight'
+        @Aggregation.default: #SUM
+        flgtbook.luggweight  as LuggageWeight,
+        
+        // Units
+        flgtbook.wunit       as UnitWeight,
     
     
         // Associations
