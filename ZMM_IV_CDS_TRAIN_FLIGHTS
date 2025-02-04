@@ -1,0 +1,33 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Basic Interface View for Flight'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #S,
+    dataClass: #TRANSACTIONAL
+}
+
+@VDM.viewType: #BASIC
+@Analytics.dataCategory: #FACT
+
+define view entity ZMM_IV_CDS_TRAIN_FLIGHTS 
+    as select from sflight
+    
+{
+        // Keys
+    key carrid      as Airline,
+    key connid      as FlightConnection,
+    key fldate      as FlightDate,
+    
+        case 
+            when $projection.FreeCapacityEconomyClass >= 50 then 'No Risk'
+            when $projection.FreeCapacityEconomyClass =  0  then 'Full'
+            else 'Risk'
+        end as StatusCapacity,
+    
+        // Measures
+        @Aggregation.default: #SUM
+        ( seatsmax - seatsocc ) as FreeCapacityEconomyClass 
+    
+}
