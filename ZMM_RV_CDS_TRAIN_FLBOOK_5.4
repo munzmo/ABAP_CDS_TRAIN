@@ -1,0 +1,87 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: 'Cube View Flight Booking'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #XL,
+    dataClass: #MIXED
+}
+
+@Analytics.dataCategory: #CUBE
+@VDM.viewType: #COMPOSITE
+
+define view entity ZMM_RV_CDS_TRAIN_FLBOOK
+    with parameters
+        P_FlightDate    : s_date   
+    as select from sbook    as flgtbook
+    
+    inner join ZMM_IV_CDS_TRAIN_FLIGHTS                 as flights
+        on  flgtbook.carrid      = flights.Airline
+        and flgtbook.connid      = flights.FlightConnection
+        and flgtbook.fldate      = flights.FlightDate
+        
+    left outer to one join ZMM_IV_CDS_TRAIN_AVG_FLGT    as avgflights
+        on  flgtbook.carrid      = avgflights.Airline
+        
+    left outer to one join ZMM_TF_CDS_TRAIN_NAMES ( P_SAPCLIENT : $session.client ) as names
+        on  flgtbook.carrid      = names.Airline
+        and flgtbook.connid      = names.FlightConnection
+        and flgtbook.fldate      = names.FlightDate  
+        
+    
+    association [0..1] to ZMM_IV_CDS_TRAIN_AIRLINE      as _Airline     on  _Airline.Airline                = $projection.AirlineCode  
+    association [0..1] to ZMM_IV_CDS_TRAIN_CON          as _Connection  on  _Connection.Airline             = $projection.AirlineCode
+                                                                        and _Connection.FlightConnection    = $projection.FlightConnection
+    association [0..1] to ZMM_IV_CDS_TRAIN_TRVAGCY      as _TrvAgency   on  _TrvAgency.TravelAgency         = $projection.TravelAgency
+    association [0..1] to ZMM_IV_CDS_TRAIN_CUST         as _Customer    on  _Customer.Customer              = $projection.Customer
+    association [0..1] to I_CalendarDate                as _FlightDate  on  _FlightDate.CalendarDate        = $projection.FlightDate        
+    
+{
+        @ObjectModel.foreignKey.association: '_Airline'
+    key flgtbook.carrid      as AirlineCode,
+        @ObjectModel.foreignKey.association: '_Connection'
+    key flgtbook.connid      as FlightConnection,
+        @ObjectModel.foreignKey.association: '_FlightDate'
+    key flgtbook.fldate      as FlightDate,
+    key cast( flgtbook.bookid as s_book_id preserving type )      as BookingNumber,
+    
+        @ObjectModel.foreignKey.association: '_TrvAgency'
+        flgtbook.agencynum   as TravelAgency,
+        @ObjectModel.foreignKey.association: '_Customer'
+        flgtbook.customid    as Customer,
+        @Semantics.address.country: true
+        _Customer.CustomerCountry,        
+        flights.StatusCapacity,        
+        names.Passengers,
+              
+        
+        // Measures
+        @Semantics.quantity.unitOfMeasure: 'UnitWeight'
+        @Aggregation.default: #SUM               
+        flgtbook.luggweight  as LuggageWeight,
+        @Aggregation.default: #SUM
+        flights.FreeCapacityEconomyClass,
+        @Aggregation.default: #SUM
+        avgflights.AVGSeatsBusiness,
+        @Aggregation.default: #SUM
+        names.PasssengerCount,
+        
+        @Semantics.amount.currencyCode: 'PaymentCuky'
+        @Aggregation.default: #SUM
+        flgtbook.forcuram    as BookingPrice,
+        
+        // Units
+        flgtbook.wunit       as UnitWeight,
+        flgtbook.forcurkey   as PaymentCuky,
+    
+    
+        // Associations
+        _Airline,
+        _Connection,
+        _TrvAgency,
+        _Customer,
+        _FlightDate
+    
+}
+where flgtbook.fldate >= $parameters.P_FlightDate
