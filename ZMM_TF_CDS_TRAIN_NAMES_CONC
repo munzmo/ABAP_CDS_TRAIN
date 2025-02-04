@@ -1,0 +1,48 @@
+class ZMM_TF_CDS_TRAIN_NAMES_CONC definition
+  public
+  final
+  create public .
+
+public section.
+    interfaces if_amdp_marker_hdb.
+    CLASS-METHODS get_names
+        for table function ZMM_TF_CDS_TRAIN_NAMES.
+protected section.
+private section.
+ENDCLASS.
+
+
+
+CLASS ZMM_TF_CDS_TRAIN_NAMES_CONC IMPLEMENTATION.
+    METHOD get_names
+        BY DATABASE FUNCTION FOR HDB
+            language sqlscript
+            options read-only
+            USING sbook.
+
+    RETURN
+
+
+    SELECT
+        a.mandt,
+        a.carrid as Airline,
+        a.connid as FlightConnection,
+        a.fldate as FlightDate,
+        COUNT(a.passname) as PasssengerCount,
+        STRING_AGG(a.passname, ', ' ORDER BY a.passname ASC) AS Passengers
+
+
+    FROM
+        sbook AS a
+    WHERE
+        a.mandt = :P_SAPCLIENT
+        AND a.passname <> ''
+    GROUP BY
+        a.mandt,
+        a.carrid,
+        a.connid,
+        a.fldate;
+
+    ENDMETHOD.
+
+ENDCLASS.
