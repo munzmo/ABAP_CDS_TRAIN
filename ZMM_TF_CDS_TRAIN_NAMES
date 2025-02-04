@@ -1,0 +1,19 @@
+@ClientHandling.type: #CLIENT_DEPENDENT
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@EndUserText.label: 'Table Function for Names'
+define table function ZMM_TF_CDS_TRAIN_NAMES
+    with parameters 
+    @Environment.systemField: #CLIENT
+    P_SAPCLIENT : vdm_v_sap_client
+returns 
+
+{
+  mandt                     :   vdm_v_sap_client;
+  Airline                   :   s_carr_id;
+  FlightConnection          :   s_conn_id;
+  FlightDate                :   s_date;
+  PasssengerCount           :   abap.int4; 
+  Passengers                :   abap.string;
+     
+}
+implemented by method ZMM_TF_CDS_TRAIN_NAMES_CONC=>get_names;
