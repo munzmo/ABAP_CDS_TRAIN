@@ -13,7 +13,7 @@ returns
   FlightConnection          :   s_conn_id;
   FlightDate                :   s_date;
   PasssengerCount           :   abap.int4; 
-  Passengers                :   abap.char( 1333 );
+  Passengers                :   abap.char( 250 );
      
 }
 implemented by method ZMM_TF_CDS_TRAIN_NAMES_CONC=>get_names;
