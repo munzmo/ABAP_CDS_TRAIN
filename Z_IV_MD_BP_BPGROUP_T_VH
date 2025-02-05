@@ -1,0 +1,35 @@
+@ObjectModel.dataCategory: #TEXT
+@ObjectModel.representativeKey: 'BusinessPartnerGrouping'
+@ObjectModel.usageType.dataClass: #CUSTOMIZING
+@ObjectModel.usageType.serviceQuality: #A 
+@ObjectModel.usageType.sizeCategory: #S
+@EndUserText.label: 'Value Helper BP Grouping Text'
+@VDM.viewType: #BASIC
+@AccessControl.authorizationCheck:#NOT_REQUIRED
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.modelingPattern:           #LANGUAGE_DEPENDENT_TEXT
+@ObjectModel.supportedCapabilities:  [  #CDS_MODELING_DATA_SOURCE,
+                                        #CDS_MODELING_ASSOCIATION_TARGET,
+                                        #LANGUAGE_DEPENDENT_TEXT ]
+
+define view entity Z_IV_MD_BP_BPGROUP_T_VH 
+    as select from tb002
+
+    association [0..1] to I_Language                 as _Language        on $projection.Language                    = _Language.Language
+    association [0..1] to Z_IV_MD_BP_BPGROUP_VH      as _BPGrouping      on $projection.BusinessPartnerGrouping     = _BPGrouping.BusinessPartnerGrouping
+{
+        @ObjectModel.foreignKey.association: '_BPGrouping'
+    key bu_group       as BusinessPartnerGrouping,
+        @Semantics.language:true
+        @ObjectModel.foreignKey.association: '_Language'
+    key spras          as Language,
+        
+        @Semantics.text:true
+        txt15          as Description,
+    
+        _Language,
+        _BPGrouping
+    
+}
+      // exclude patient data from value helper
+where tb002.bu_group <> 'PATI'
