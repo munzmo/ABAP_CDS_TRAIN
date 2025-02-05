@@ -1,0 +1,29 @@
+@ObjectModel.representativeKey: 'BusinessPartnerGrouping'
+@ObjectModel.usageType.dataClass: #CUSTOMIZING
+@ObjectModel.usageType.serviceQuality: #A 
+@ObjectModel.usageType.sizeCategory: #S
+@EndUserText.label: 'Value Helper BP Grouping'
+@Analytics.dataCategory: #DIMENSION
+@VDM.viewType: #BASIC
+@AccessControl.authorizationCheck:#NOT_REQUIRED
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.modelingPattern:           #ANALYTICAL_DIMENSION
+@ObjectModel.supportedCapabilities:  [  #SQL_DATA_SOURCE,
+                                        #CDS_MODELING_DATA_SOURCE,
+                                        #CDS_MODELING_ASSOCIATION_TARGET,
+                                        #ANALYTICAL_DIMENSION  ]
+
+define view entity Z_IV_MD_BP_BPGROUP_VH 
+    as select from tb001
+    
+    association[0..*] to Z_IV_MD_BP_BPGROUP_T_VH as _Text on $projection.BusinessPartnerGrouping = _Text.BusinessPartnerGrouping
+
+{
+        @ObjectModel.text.association: '_Text'
+    key bu_group        as BusinessPartnerGrouping,
+    
+        _Text
+          
+}
+      // exclude patient data from value helper
+where tb001.bu_group <> 'PATI'
