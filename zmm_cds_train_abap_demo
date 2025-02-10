@@ -1,0 +1,32 @@
+*&---------------------------------------------------------------------*
+*& Report zmm_cds_train_abap_demo
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zmm_cds_train_abap_demo.
+
+" Data declaration: lt_cust table to hold CDS view data.
+DATA: lt_cust TYPE TABLE OF zmm_iv_cds_train_cust,
+      lo_alv  TYPE REF TO cl_salv_table.
+
+START-OF-SELECTION.
+  " Select data from the CDS view into an internal table.
+  SELECT * FROM zmm_iv_cds_train_cust WHERE CustomerCountry = 'DE'
+    INTO TABLE @lt_cust.
+
+  IF lt_cust IS INITIAL.
+    MESSAGE 'No data found.' TYPE 'I'.
+    EXIT.
+  ENDIF.
+
+" Create and display the ALV grid using the SALV factory.
+  TRY.
+      cl_salv_table=>factory(
+        IMPORTING
+          r_salv_table = lo_alv
+        CHANGING
+          t_table      = lt_cust ).
+      lo_alv->display( ).
+    CATCH cx_salv_msg INTO DATA(lx_msg).
+      MESSAGE lx_msg TYPE 'E'.
+  ENDTRY.
