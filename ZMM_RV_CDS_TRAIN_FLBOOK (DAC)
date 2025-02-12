@@ -5,6 +5,7 @@ define role ZMM_RV_CDS_TRAIN_FLBOOK {
     where ( CustomerCountry ) = 
     aspect pfcg_auth(  /DMO/TRVL,
                        /DMO/CNTRY,
-                       ACTVT = '03' );
+                       ACTVT = '03' )
+    or AirlineCode = 'LH';
                         
 }
