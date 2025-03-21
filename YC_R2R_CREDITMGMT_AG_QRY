@@ -1,0 +1,228 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Consumption View Crdt Mgmt AG'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #XXL,
+    dataClass: #MIXED
+}
+
+@VDM.viewType: #CONSUMPTION
+@Analytics.query: true
+
+define view entity YC_R2R_CREDITMGMT_AG_QRY
+    with parameters
+    @EndUserText.label: 'Key Date'
+    @Environment.systemField: #SYSTEM_DATE
+    P_KeyDate   : abap.dats,
+    @EndUserText.label: 'Range A'
+    @Consumption.defaultValue: '30'
+    P_RangeA    : abap.int2,
+    @EndUserText.label: 'Range B'
+    @Consumption.defaultValue: '90'
+    P_RangeB    : abap.int2,
+    @EndUserText.label: 'Range C'
+    @Consumption.defaultValue: '180'
+    P_RangeC    : abap.int2,
+    @EndUserText.label: 'Range D'
+    @Consumption.defaultValue: '180'
+    P_RangeD    : abap.int2,
+    @EndUserText.label: 'Range E'
+    @Consumption.defaultValue: '360'
+    P_RangeE    : abap.int2 
+    
+    as select from YI_R2R_CREDITMGMT_AG_CUBE (  P_KeyDate : $parameters.P_KeyDate,
+                                                P_RangeA  : $parameters.P_RangeA,
+                                                P_RangeB  : $parameters.P_RangeB,
+                                                P_RangeC  : $parameters.P_RangeC,
+                                                P_RangeD  : $parameters.P_RangeD,
+                                                P_RangeE  : $parameters.P_RangeE )
+{
+        // Keys
+        @AnalyticsDetails.query.display: #KEY_TEXT
+        @AnalyticsDetails.query.axis: #ROWS
+        @AnalyticsDetails: {query.variableSequence: 1}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: true,
+                                mandatory: false}
+    key CompanyCode,
+        @AnalyticsDetails: {query.variableSequence: 2}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: true,
+                                mandatory: false}
+    key AccountingDocument,
+        @AnalyticsDetails: {query.variableSequence: 3}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: true,
+                                mandatory: false}
+    key FiscalYear,
+    key AccountingDocumentItem,
+    
+        // Characteristics
+        ClearingJournalEntry,
+        @AnalyticsDetails: {query.variableSequence: 5}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: true,
+                                mandatory: false}
+        FinancialAccountType,
+        @AnalyticsDetails: {query.variableSequence: 6}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: true,
+                                mandatory: false}
+        GLAccount,
+        @AnalyticsDetails: {query.variableSequence: 7}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: true,
+                                mandatory: false}
+        @AnalyticsDetails.query.display: #KEY_TEXT
+        @AnalyticsDetails.query.axis: #ROWS
+        Customer,
+        @EndUserText.label: 'Key Date'
+        @AnalyticsDetails.query.axis: #ROWS
+        KeyDate,
+        ChartOfAccounts,
+        @AnalyticsDetails: {query.variableSequence: 9}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: true,
+                                mandatory: false}
+        PaymentTerms,
+        @AnalyticsDetails: {query.variableSequence: 15}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: true,
+                                mandatory: false}
+        AccountingDocumentType,
+    
+        // Numerics & Decimals
+        ClearingJournalEntryFiscalYear,
+        @AnalyticsDetails: {query.variableSequence: 10}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: false,
+                                mandatory: false}
+        CashDiscount1Days,
+        @AnalyticsDetails: {query.variableSequence: 11}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: false,
+                                mandatory: false}        
+        CashDiscount2Days,
+        @AnalyticsDetails: {query.variableSequence: 12}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: false,
+                                mandatory: false}
+        NetPaymentDays,
+    
+        // Dates
+        @AnalyticsDetails: {query.variableSequence: 4}
+        @Consumption.filter: {  selectionType: #INTERVAL,
+                                multipleSelections: true,
+                                mandatory: false}
+        ClearingDate,
+        @AnalyticsDetails: {query.variableSequence: 8}
+        @Consumption.filter: {  selectionType: #INTERVAL,
+                                multipleSelections: true,
+                                mandatory: false}
+        DueCalculationBaseDate,
+        @AnalyticsDetails: {query.variableSequence: 13}
+        @Consumption.filter: {  selectionType: #INTERVAL,
+                                multipleSelections: true,
+                                mandatory: false}        
+        PostingDate,
+        @AnalyticsDetails: {query.variableSequence: 14}
+        @Consumption.filter: {  selectionType: #INTERVAL,
+                                multipleSelections: true,
+                                mandatory: false}   
+        DocumentDate,
+        @AnalyticsDetails: {query.variableSequence: 16}
+        @Consumption.filter: {  selectionType: #INTERVAL,
+                                multipleSelections: true,
+                                mandatory: false}
+        NetDueDate,
+        @AnalyticsDetails: {query.variableSequence: 17}
+        @Consumption.filter: {  selectionType: #INTERVAL,
+                                multipleSelections: true,
+                                mandatory: false}
+        CashDiscount1DueDate,
+        @AnalyticsDetails: {query.variableSequence: 18}
+        @Consumption.filter: {  selectionType: #INTERVAL,
+                                multipleSelections: true,
+                                mandatory: false}
+        CashDiscount2DueDate,
+    
+        // Key figures
+        @Semantics.amount.currencyCode: 'BalanceTransactionCurrency'
+        @AnalyticsDetails.query.hidden: true
+        AmountInBalanceTransacCrcy,
+        @Semantics.amount.currencyCode: 'AdditionalCurrency1'
+        @AnalyticsDetails.query.hidden: true
+        AmountInAdditionalCurrency1,
+    
+        // Calculated Key figures
+        @EndUserText.label: 'OP Saldo'
+        @Semantics.amount.currencyCode: 'AdditionalCurrency1'
+        OPSaldo,
+        @EndUserText.label: 'OP Saldo (n. fällig)'
+        @Semantics.amount.currencyCode: 'AdditionalCurrency1'
+        OPSaldoN,
+        @EndUserText.label: 'Fällig'
+        @Semantics.amount.currencyCode: 'AdditionalCurrency1'
+        Faellig,
+        @Consumption.dynamicLabel: {    label   : 'OP Saldo (&1 - &2 Days)', 
+                                        binding : [ { index : 1 , parameter : 'P_RangeA' }, 
+                                                    { index : 2 , parameter : 'P_RangeB' } ] }
+        @Semantics.amount.currencyCode: 'AdditionalCurrency1'
+        OPSaldo_Range1,
+        @Consumption.dynamicLabel: {    label   : 'OP Saldo (&1 - &2 Days)', 
+                                        binding : [ { index : 1 , parameter : 'P_RangeB' }, 
+                                                    { index : 2 , parameter : 'P_RangeC' } ] }
+        @Semantics.amount.currencyCode: 'AdditionalCurrency1'
+        OPSaldo_Range2,
+        @Consumption.dynamicLabel: {    label   : 'OP Saldo (&1 - &2 Days)', 
+                                        binding : [ { index : 1 , parameter : 'P_RangeD' }, 
+                                                    { index : 2 , parameter : 'P_RangeE' } ] }
+        @Semantics.amount.currencyCode: 'AdditionalCurrency1'
+        OPSaldo_Range3,
+        @Consumption.dynamicLabel: {    label   : 'OP Saldo (>&1 Days)', 
+                                        binding : [ { index : 1 , parameter : 'P_RangeE' } ] }
+        @Semantics.amount.currencyCode: 'AdditionalCurrency1'
+        OPSaldo_Range4,
+        @EndUserText.label: 'OP Saldo > 31 Days'
+        @Semantics.amount.currencyCode: 'AdditionalCurrency1'
+        OPSaldo_31,
+        @EndUserText.label: 'OP Saldo > 181 Days'
+        @Semantics.amount.currencyCode: 'AdditionalCurrency1'
+        OPSaldo_181,
+        
+        // Currency
+        @AnalyticsDetails: {query.variableSequence: 19}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: true,
+                                mandatory: false}
+        BalanceTransactionCurrency,
+        @AnalyticsDetails: {query.variableSequence: 20}
+        @Consumption.filter: {  selectionType: #SINGLE,
+                                multipleSelections: true,
+                                mandatory: false}
+        AdditionalCurrency1,
+    
+        // Associations
+        _AccountingDocumentType,
+        _AdditionalCurrency1,
+        _BalanceTransactionCurrency,
+        _CashDiscDueDate1,
+        _CashDiscDueDate2,
+        _ChartOfAccounts,
+        _ClearingDate,
+        _ClearingJournalEntry,
+        _ClearingJrnlEntryFiscalYear,
+        _CompanyCode,
+        _Customer,
+        _CustPayTerm,
+        _DocumentDate,
+        _DueCalBaseDate,
+        _FinancialAccountType,
+        _FiscalYear,
+        _GLAccountInChartOfAccounts,
+        _JournalEntry,
+        _NetDueDate,
+        _PostingDate
+}
