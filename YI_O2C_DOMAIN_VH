@@ -1,0 +1,38 @@
+@ObjectModel.representativeKey: 'DomainValue'
+@ObjectModel.usageType.dataClass: #CUSTOMIZING
+@ObjectModel.usageType.serviceQuality: #A 
+@ObjectModel.usageType.sizeCategory: #S
+@EndUserText.label: 'Value Helper SD XFELD'
+@Analytics.dataCategory: #DIMENSION
+@VDM.viewType: #COMPOSITE
+@AccessControl.authorizationCheck:#NOT_REQUIRED
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.modelingPattern:           #ANALYTICAL_DIMENSION
+@ObjectModel.supportedCapabilities:  [  #SQL_DATA_SOURCE,
+                                        #CDS_MODELING_DATA_SOURCE,
+                                        #CDS_MODELING_ASSOCIATION_TARGET,
+                                        #ANALYTICAL_DIMENSION  ]
+
+
+define view entity YI_O2C_DOMAIN_VH 
+    as select from I_DomainFixedValue       as a
+        inner join I_DomainFixedValueText   as b
+            on  a.SAPDataDictionaryDomain   = b.SAPDataDictionaryDomain
+            and a.DomainValue               = b.DomainValue
+            and a.DomainActivationState     = b.DomainActivationState
+            and a.DomainValuePosition       = b.DomainValuePosition
+            and a.DomainVersion             = b.DomainVersion 
+                                                                            
+{
+
+        // warning can be ignored due the filter criteria a.SAPDataDictionaryDomain = 'XFELD'
+        @ObjectModel.text.element: [ 'DomainText' ]
+    key cast( a.DomainValue as xfeld ) as DomainValue,
+        @Semantics.text: true
+        b.DomainText
+
+}
+where a.SAPDataDictionaryDomain = 'XFELD'
+and   a.DomainActivationState   = 'A'
+and   b.Language                = $session.system_language
+                       
