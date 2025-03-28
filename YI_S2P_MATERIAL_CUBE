@@ -1,0 +1,357 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: 'Composite Interface View Material'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #XL,
+    dataClass: #MASTER
+}
+
+@VDM.viewType: #COMPOSITE
+@Analytics.dataCategory: #CUBE
+
+define view entity YI_S2P_MATERIAL_CUBE 
+    // primary ds from sales
+    as select from YI_S2P_MATERIAL_SALES                        as sales    
+    
+    // leading matnr from mara
+    right outer join YI_S2P_MATERIAL_CENTRAL                    as central
+        on  sales.Material              = central.Material
+    
+    // combine plant data    
+    left outer to many join YI_S2P_MATERIAL_PLANT               as plant
+       on central.Material              = plant.Material
+    
+    // get valid Plants for SalesOrganization    
+    left outer to many join tvkwz                               as h1
+        on  sales.SalesOrganization     = h1.vkorg
+        and sales.DistributionChannel   = h1.vtweg
+    
+    // combine valuation data
+    left outer to one join t001k                                as h2
+        on  plant.Plant                 = h2.bwkey        
+    left outer to one join  YI_S2P_MATERIAL_VALUATION           as valuation
+        on  h2.bwkey                    = valuation.ValuationArea
+        and central.Material            = valuation.Material
+       
+    // combine Units of Measure for Material data
+    // get records only for mara-meins <> marm.meinh
+    left outer to many join I_MaterialUnitOfMeasure             as matunit
+        on  central.Material            =  matunit.Material
+        and central.BaseUnitMeasure     <> matunit.AlternativeUnit
+    
+    association [0..1] to I_UnitOfMeasure       as _AUOM            on  _AUOM.UnitOfMeasure     = $projection.AlternativeUnit
+    association [0..1] to I_Plant               as _PlantSalesOrg   on  _PlantSalesOrg.Plant    = $projection.PlantSalesOrg     
+        
+{
+
+
+        // Keys
+        @ObjectModel.foreignKey.association: '_MaterialCent'        
+    key central.Material,
+        @ObjectModel.foreignKey.association: '_SalesOrgSales'
+    key sales.SalesOrganization,
+        @ObjectModel.foreignKey.association: '_DistChanSales'
+    key sales.DistributionChannel,
+        @ObjectModel.foreignKey.association: '_Plant'
+    key plant.Plant,
+        @ObjectModel.foreignKey.association: '_AUOM'
+    key matunit.AlternativeUnit,
+        @ObjectModel.foreignKey.association: '_ValArea'
+    key valuation.ValuationArea,
+        @ObjectModel.foreignKey.association: '_PlantSalesOrg'
+    key cast( h1.werks as werks_ext preserving type )  as PlantSalesOrg,
+
+        
+        // Characteristics
+        @ObjectModel.foreignKey.association: '_CentCreatBy'
+        central.CreatedBy,
+        @ObjectModel.foreignKey.association: '_CentChangeBy'
+        central.ChangedBy,
+        central.DeletionFlagCent,
+        @ObjectModel.foreignKey.association: '_CentMatType'
+        central.MaterialType,
+        @ObjectModel.foreignKey.association: '_CentIndSect'
+        central.IndustrySector,
+        @ObjectModel.foreignKey.association: '_CentMatGrp'
+        central.MaterialGroup,
+        central.OldMaterialNumber,
+        central.BasicMaterial,
+        @ObjectModel.foreignKey.association: '_CentPurgValKey'
+        central.PurchasingValueKey,
+        @ObjectModel.foreignKey.association: '_CentDiv'
+        central.Division,
+        central.EAN_UPC,
+        @ObjectModel.foreignKey.association: '_CentEANCat'
+        central.EANCategory,
+        @ObjectModel.foreignKey.association: '_CentProdHier'
+        central.ProductHierarchy,
+        central.EnvironmentallyRelevant,
+        central.ManufacturerPartNumber,
+        @ObjectModel.foreignKey.association: '_CentSupp'
+        central.Manufacturer,
+        @ObjectModel.foreignKey.association: '_DGIndCent'
+        central.DGIndProfile,
+        @ObjectModel.foreignKey.association: '_ProdStatCent'
+        central.CrossPlantMaterialStatus,   
+        sales.DeletionFlagSales,
+        @ObjectModel.foreignKey.association: '_SalesDistStat'
+        sales.ProductSalesStatus,
+        @ObjectModel.foreignKey.association: '_ItemCatGrpSales'
+        sales.ItemCategoryGroup,
+        @ObjectModel.foreignKey.association: '_PlantSales'
+        sales.DeliveringPlant,
+        @ObjectModel.foreignKey.association: '_PrRefMatSales'
+        sales.PricingReferenceMaterial,
+        @ObjectModel.foreignKey.association: '_MatPriceGrpSales'
+        sales.MaterialPricingGroup,
+        @ObjectModel.foreignKey.association: '_MatAccGrpSales'
+        sales.AcctAssmtGrpMat,
+        @ObjectModel.foreignKey.association: '_SalesProdGrp3'
+        sales.SalesSpcfcProductGroup3,
+        @ObjectModel.foreignKey.association: '_SalesProdGrp4'
+        sales.SalesSpcfcProductGroup4,
+        plant.DeletionFlagPlant,
+        @ObjectModel.foreignKey.association: '_ProdStatPlant'
+        plant.MaterialStatusPlant,
+        @ObjectModel.foreignKey.association: '_ABCClasPlant'
+        plant.ABCIndicator,
+        plant.CriticalPartInd,
+        @ObjectModel.foreignKey.association: '_PurchGrpPlant'
+        plant.PurchasingGroup,
+        @ObjectModel.foreignKey.association: '_MRPProfPlant'
+        plant.MRPProfile,
+        @ObjectModel.foreignKey.association: '_MRPTypePlant'
+        plant.MRPType,
+        @ObjectModel.foreignKey.association: '_MRPContPlant'
+        plant.MRPController,
+        plant.MRPControllerFlag,
+        plant.PeriodIndicator,
+        @ObjectModel.foreignKey.association: '_MRPLotSizePlant'
+        plant.MaterialLotSizingProcedure,
+        plant.ProcurementType,
+        @ObjectModel.foreignKey.association: '_MatlProcProfPlant'
+        plant.MaterialProcurementProfile,
+        plant.ProfitCenter,
+        @ObjectModel.foreignKey.association: '_MatOriPlant'
+        plant.Origin,
+        @ObjectModel.foreignKey.association: '_FolMaterialPlant'
+        plant.FollowUpMaterial,
+        plant.MixedMRPIndicator,
+        plant.SchedulingMarginKey,
+        @ObjectModel.foreignKey.association: '_ProdSupPlant'
+        plant.ProductionSupervisor,
+        plant.UnltdOverdeliveryFlag,
+        @ObjectModel.foreignKey.association: '_PlantLoadGrp'
+        plant.LoadingGroup,
+        plant.QuotaArrangementUsage,
+        @ObjectModel.foreignKey.association: '_PlantATPChkGrp'
+        plant.AvailabilityCheck,
+        plant.AutomaticPOIndicator,
+        plant.SourceListIndicator,
+        plant.CommodityCode,
+        @ObjectModel.foreignKey.association: '_RegionPlant'
+        plant.RegionOrigin,
+        plant.PlanningTimeFence,
+        plant.ConsumptionMode,
+        plant.ConsumptionPeriodBackward,
+        plant.ConsumptionPeriodForward,
+        @ObjectModel.foreignKey.association: '_MatlProcProfCPlant'
+        plant.SpecProcuremCosting,
+        @ObjectModel.foreignKey.association: '_StorLocPlant'
+        plant.ProductionStorageLocation,
+        @ObjectModel.foreignKey.association: '_MRPGrpPlant'
+        plant.MRPGroup,
+        @ObjectModel.foreignKey.association: '_MRPPlanPerPlant'
+        plant.MRPPlanningCalendar,
+        @ObjectModel.foreignKey.association: '_PlanStratGrpPlant'
+        plant.PlanningStrategyGroup,
+        plant.BulkMaterialIndicator,
+        plant.MRPAreaExistsIndicator,
+        plant.VarianceKey,
+        plant.DoNotCost,        
+        valuation.DeletionFlagValuation,
+        valuation.MatLedgerActive,
+        valuation.PriceControlIndicator,
+        
+        
+        // Dates
+        @ObjectModel.foreignKey.association: '_CentCreated'
+        central.CreatedOn,
+        @ObjectModel.foreignKey.association: '_LChangeCent'
+        central.LastChange,
+        @ObjectModel.foreignKey.association: '_ValidFromSales'
+        sales.ValidFromSales,
+        @ObjectModel.foreignKey.association: '_ExpDateSales'
+        sales.ExpiryDate,
+        @ObjectModel.foreignKey.association: '_ExtDelDateSales'
+        sales.ExternalDeliveryDate,
+        @ObjectModel.foreignKey.association: '_IntDelDateSales'
+        sales.InternalDeliveryDate,
+        @ObjectModel.foreignKey.association: '_ValidFromPlant'
+        plant.ValidFromPlant,
+        
+        // Cast commands to avoid technically incorrect summations        
+        cast( matunit.QuantityNumerator         as abap.char( 7 ))  as QuantityNumerator,
+        cast( matunit.QuantityDenominator       as abap.char( 7 ))  as QuantityDenominator,
+        cast( plant.PlDelivTimeDays             as abap.char( 5 ))  as PlDelivTimeDays,
+        cast( plant.GRProcessingTimeDays        as abap.char( 5 ))  as GRProcessingTimeDays,
+        cast( plant.InHouseProductionTime       as abap.char( 5 ))  as InHouseProductionTime,
+        cast( plant.OverdeliveryToleranceLimit  as abap.char( 5 ))  as OverdeliveryToleranceLimit,
+        cast( plant.UnderdeliveryToleranceLimit as abap.char( 5 ))  as UnderdeliveryToleranceLimit,
+        cast( plant.TotReplLeadTimeDays         as abap.char( 5 ))  as TotReplLeadTimeDays,
+        
+        // Measures
+        @Aggregation.default: #SUM 
+        @Semantics.quantity.unitOfMeasure: 'UnitWeight'
+        central.GrossWeight,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'UnitWeight'
+        central.NetWeight,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'VolumeUnit'
+        central.Volume,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'UnitDimension'
+        central.Length,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'UnitDimension'
+        central.Width,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'UnitDimension'
+        central.Height,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Sales'
+        sales.MinimumOrderQty,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Sales'
+        sales.MinimumDeliveryQty,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Sales'
+        sales.DeliveryUnit,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Plant'
+        plant.ReorderPoint,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Plant'
+        plant.SafetyStock,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Plant'
+        plant.MinimumLotSize,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Plant'
+        plant.MaximumLotSize,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Plant'
+        plant.FixedLotSize,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Plant'
+        plant.RoundingValue,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Plant'
+        plant.MaximumStockLevel,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Plant'
+        plant.BaseQuantity,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Plant'
+        plant.CostingLotSize,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'BaseUnitMeasure_Plant'
+        plant.MinimumSafetyStock,
+        @Aggregation.default: #SUM
+        @Semantics.quantity.unitOfMeasure: 'UOMValCent'
+        valuation.TotalStock,
+        @Aggregation.default: #SUM
+        @Semantics.amount.currencyCode: 'CurrKeyVal'
+        valuation.TotalValue,
+        
+        // Units
+        @ObjectModel.foreignKey.association: '_BOMCent'
+        central.BaseUnitMeasure,
+        @ObjectModel.foreignKey.association: '_POUOMCent'
+        central.OrderUnit,
+        @ObjectModel.foreignKey.association: '_UOWCent'
+        central.UnitWeight,
+        @ObjectModel.foreignKey.association: '_VolCent'
+        central.VolumeUnit,
+        @ObjectModel.foreignKey.association: '_DimUOMCent'
+        central.UnitDimension,
+        @ObjectModel.foreignKey.association: '_UOMSales'
+        sales.BaseUnitMeasure_Sales,
+        @ObjectModel.foreignKey.association: '_UnitSales'
+        sales.SalesUnit,
+        @ObjectModel.foreignKey.association: '_UOMPlant'
+        plant.BaseUnitMeasure_Plant,        
+        @ObjectModel.foreignKey.association: '_UOMValCent'
+        valuation.UOMValCent,
+        @ObjectModel.foreignKey.association: '_CurrVal'
+        valuation.CurrKeyVal,
+        
+        // Associations
+        central._MaterialCent,
+        central._BOMCent,
+        central._CentChangeBy,
+        central._CentCreatBy,
+        central._CentCreated,
+        central._CentDiv,
+        central._CentEANCat,
+        central._CentIndSect,
+        central._CentMatGrp,
+        central._CentMatType,
+        central._CentProdHier,
+        central._CentPurgValKey,
+        central._CentSupp,
+        central._DGIndCent,
+        central._DimUOMCent,
+        central._LChangeCent,
+        central._POUOMCent,
+        central._UOWCent,
+        central._VolCent,
+        central._ProdStatCent,
+        sales._DistChanSales,
+        sales._ExpDateSales,
+        sales._ExtDelDateSales,
+        sales._IntDelDateSales,
+        sales._ItemCatGrpSales,
+        sales._MatAccGrpSales,
+        sales._MatPriceGrpSales,
+        sales._PlantSales,
+        sales._PrRefMatSales,
+        sales._SalesDistStat,
+        sales._SalesOrgSales,
+        sales._SalesProdGrp3,
+        sales._SalesProdGrp4,
+        sales._UnitSales,
+        sales._UOMSales,
+        sales._ValidFromSales,
+        plant._Plant,
+        plant._ABCClasPlant,
+        plant._FolMaterialPlant,
+        plant._MatlProcProfCPlant,
+        plant._MatlProcProfPlant,
+        plant._MatOriPlant,
+        plant._MRPContPlant,
+        plant._MRPGrpPlant,
+        plant._MRPLotSizePlant,
+        plant._MRPPlanPerPlant,
+        plant._MRPProfPlant,
+        plant._MRPTypePlant,
+        plant._PlanStratGrpPlant,
+        plant._PlantATPChkGrp,
+        plant._PlantLoadGrp,
+        plant._ProdStatPlant,
+        plant._ProdSupPlant,
+        plant._PurchGrpPlant,
+        plant._RegionPlant,
+        plant._StorLocPlant,
+        plant._UOMPlant,
+        plant._ValidFromPlant,
+        valuation._ValArea,
+        valuation._UOMValCent,
+        valuation._CurrVal,
+        _AUOM,
+        _PlantSalesOrg
+        
+}
